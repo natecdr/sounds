@@ -13,7 +13,7 @@ res_dict = {
 
 for file in files_found:
     print(files_found)
-    parent = file.parent.as_posix()
+    parent = file.parent.stem
     if parent not in res_dict:
         res_dict[parent] = []
         

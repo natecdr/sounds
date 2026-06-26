@@ -1,12 +1,12 @@
 {
     "_base": "https://raw.githubusercontent.com/natecdr/sounds/main/",
-    "drums/kicks": [
+    "kicks": [
         "3Q_DT2_Kick_03_3473291.wav",
         "3Q_THS_Kick_11_3434229.wav",
         "PMTD_Kick_04_2227159.wav",
         "WAFDP_Kick_02_510552.wav"
     ],
-    "drums/snares": [
+    "snares": [
         "US_LAS_snare_thin_3318464.wav"
     ]
 }
