@@ -1,0 +1,35 @@
+var bpm = 174
+var cpm = bpm/4
+
+samples('github:natecdr/Sounds/main')
+
+setcpm(cpm)
+
+$: n("[2 - [- 2] [- 2?]]")
+  .sound("kicks")
+  .duckorbit(2)
+
+$: n("[- 0 - 0]")
+  .sound("snares")
+  .off(
+    1/8, x=> x.gain(0.3).speed(1.5)
+  )
+
+$: n("0*8")
+  .sound("hh")
+  .sometimesBy(0.2, x=> x.speed(2))
+
+$: note("<e1 [g1 f#1] c1 [g1 a1]>/2")
+  .sound("saw")
+  .lpf(800)
+  .distort(1)
+  .disttype("diode")
+  .orbit(2)
+
+$: note("<e3 g3 b3 e4>*8")
+  .transpose(12)
+  .room(0.5)
+  .sound("tri")
+  .decay(0.2)
+  .every(4, x=> x.decay(0.5).room(1).delay(0.5))
+  .orbit(2)
