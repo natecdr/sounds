@@ -12,12 +12,11 @@ res_dict = {
 }
 
 for file in files_found:
-    print(files_found)
     parent = file.parent.stem
     if parent not in res_dict:
         res_dict[parent] = []
         
-    res_dict[parent].append(file.name)
+    res_dict[parent].append(file.as_posix())
     
 with open("./strudel.json", "w") as f:
     json.dump(res_dict, f, indent=4)
