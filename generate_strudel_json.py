@@ -1,13 +1,23 @@
 from pathlib import Path
+import json
 
-extensions = [".mp4", ".MP4", ".wav", ".WAV"]
+extensions = [".mp4", ".wav"]
 
 files_found = []
 for ext in extensions:
     files_found.extend(Path(".").rglob(f"*{ext}"))
 
-# res_dict = {
-#     _base: "https://raw.githubusercontent.com/natecdr/"
-# }
+res_dict = {
+    "_base": "https://raw.githubusercontent.com/natecdr/sounds/main/"
+}
 
-# print(files_found)
+for file in files_found:
+    print(files_found)
+    parent = file.parent.as_posix()
+    if parent not in res_dict:
+        res_dict[parent] = []
+        
+    res_dict[parent].append(file.name)
+    
+with open("./strudel.json", "w") as f:
+    json.dump(res_dict, f, indent=4)
