@@ -1,0 +1,45 @@
+var bpm = 130 
+var cpm = bpm/4
+
+setcpm(cpm)
+
+samples('bubo:waveforms');
+samples('github:switchangel/breaks')
+
+$: s("breaks:0").slow(2).fit()
+  .slice(8, irand(8).segment(8))
+  .gain(0.6)
+  .hpf(400)
+
+$: note(run(8).every(4, x=> x.rev()))
+  .scale("A:blues")
+  .sound("piano")
+  .release(1)
+  .every(2, x=> x.decay(0.2))
+  .room(perlin.range(0, 1))
+  .delay(0.5).delays(1/6)
+  .layer(
+    x => x,
+    x => x.scaleTranspose(4).gain(0.8)
+  )
+
+_$: s("bd:6*4")
+
+$: s("rim(5, 16)").decay(0.05)
+
+$: s("hh*8")
+  .almostNever(x=>x.ply(2))
+  .mask("<1 1 1 [1 0]>")
+  .gain(perlin.range(0.5, 0.8))
+
+$: n("<0 5 2 4>")
+  .scale("A1:minor")
+  .sound("sawtooth")
+  .lpf(1500)
+
+$: chord("<Am F C <G E7>>")
+  .dict("ireal").voicing()
+  .arp("0 1 2 3".fast(2))
+  .sound("vibraphone")
+  .gain(0.4)
+

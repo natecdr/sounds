@@ -1,0 +1,46 @@
+var bpm = 110
+var cpm = bpm/4
+
+setcpm(cpm)
+
+var chords = "<Gm7 Dm7 Cm7 A#>"
+
+$: chord(chords).voicing()
+  .arp(irand(4).segment(16))
+  .transpose("[0 | 12]*16")
+  .sound("saw")
+  .slidey("0.02")
+  .attack(0.01)
+  .rib(12, 4)
+  // .layer(
+  //   x => x, 
+  //   // x => x.transpose(12),
+  // )
+  .superimpose(x=>x.transpose(12).gain(0.6))
+  .room(1)
+  .delay(0.5)
+  .delays(1/4)
+  .orbit(3)
+
+$: note("<g1 d1 d#1 a#0>")
+  .slidey(0.5)
+  .attack(0.01)
+  .sound("supersaw")
+  .soft(1)
+  .orbit(2)
+
+$: note("a#5(9, 16)")
+  .sound("gm_celesta")
+  .pickF(
+    "1@1 0@15", [id, transpose("3M")]
+  )
+  .click(1)
+  .decay(0.2)
+  .room(1)
+
+$: s("bd:4")
+  .struct("[x x] x(3, 8)")
+  .duck("2:3")
+  .duckattack(0.1)
+  .duckdepth("0.8:0.5")
+

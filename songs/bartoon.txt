@@ -1,0 +1,27 @@
+var bpm = 130 
+var cpm = bpm/4
+
+samples('github:natecdr/soUnds/main')
+
+setcpm(cpm)
+
+const noisySaw = (mel) => stack(
+  note(mel).transpose(-12).s("supersaw"),
+  note(mel).s("white").velocity(0.05)
+)
+
+$: n("0*4")
+  .sound("kicks")
+  .duck(2)
+
+$: n("[-  1 - 1]")
+  .sound("snares")
+
+$: sound("[- hh:2]*4").velocity(2)
+
+$: noisySaw("c2@3 <c3 [c3 [c3 c4]]>").gain(1)
+  .lfo({
+    shape:"triangle", skew: 0, sync:16, control:"gain"
+  })
+  .soft(2)
+  .orbit(2)

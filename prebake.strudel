@@ -1,0 +1,67 @@
+register('slideTo', (semitones, pat) => 
+  pat.penv(semitones).panchor(1)
+)
+
+register('slideFrom', (semitones, pat) => 
+  pat.penv(-semitones).panchor(1)
+)
+
+function ensureMidiNote(note) {
+    if (typeof note === 'string') {
+      note = noteToMidi(note);
+    }
+  return note
+}
+
+register('slidey', function (time, pat) {
+  let prevNote = null;
+  
+  const query = (state) => {
+    const haps = pat.query(state);
+  
+    const new_haps = []
+    for (var i = 0; i < haps.length; i++) {
+      let hap = haps[i]
+
+      let note = ensureMidiNote(hap.value.note)
+  
+      let difference = 0
+      if (prevNote != null) {
+        difference = note - prevNote;
+      }
+      prevNote = note
+  
+      let newVal = hap.value;
+      newVal = {
+        ...hap.value,
+        panchor: 1,
+        penv: difference,
+        pattack: time,
+      }
+  
+      hap.value = newVal
+      new_haps.push(
+        new Hap(hap.whole, hap.part, newVal, hap.context)
+      );
+    }
+    return new_haps
+  };
+  return new Pattern(query);
+});
+
+
+register('click', function (amt, pat) {
+  if(amt > 0) {
+    return pat.slideFrom(amt * 60).pattack(0.01) 
+  } else {
+    return  pat
+  }
+});
+
+
+register('print_haps', function (pat) {
+  const haps = pat.queryArc(0, 1);
+  console.log(haps.map((e) => e.show()));
+  return pat;
+});
+
