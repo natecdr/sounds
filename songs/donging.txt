@@ -1,0 +1,50 @@
+var bpm = 120
+setcpm(bpm/4)
+
+dong: note("4 5 1 0").scale("C:major")
+  .sound("gm_pad_bowed")
+  .sometimesBy(
+    0.2, 
+    x=>x.superimpose(
+      x=>x.transpose("12 | 7")
+    )
+  )
+  .decay(0.5)
+  .ply(2)
+  .legato(1.1)
+  .room(1)
+  .delay(0.5)
+  .orbit(2)
+
+
+
+_shaker: sound("shaker_large")
+  .struct("x*16")
+  .gain(0.4)
+  .pickF("[1 0 0 1 0 0 1 0]*2",  [id, x=>x.gain(0.8)])
+
+_lead: note("<2@2 4 <5 -1>>")
+  .superimpose(x=>x.transpose(7))
+  .gain(0.6)
+  .scale("C3:major")
+  .sound("supersaw")
+  .room(1)
+  .glide(0.3)
+  .orbit(2)
+
+_kick: sound("bd:6*4")
+  .duck(2).duckattack(0.1).duckdepth(0.8)
+
+// _kick: sound("bd:6*1")
+//   .duck(2).duckattack(0.2)
+
+_clap: sound("clap:4")
+  .struct("[- x]*2")
+  .room(1)
+
+_bass: note("<0@3 5>")
+  .scale("C2:major")
+  .sound("supersaw")
+  .lpf(500)
+  .orbit(2)
+  

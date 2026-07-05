@@ -1,3 +1,16 @@
+// Prebake script
+//
+// This is code that is loaded before your pattern is run.
+// You can use it to define custom functions to use in any pattern.
+// 
+// This is an initial example script. You can edit it to add 
+// your own funtions.
+//
+// To use a script shared by some other user you can use
+// the import-button or paste the script in this editor.
+
+const ratchet = register('ratchet', (pat) => pat.sometimes(ply(2)))
+
 register('slideTo', (semitones, pat) => 
   pat.penv(semitones).panchor(1)
 )
@@ -13,7 +26,7 @@ function ensureMidiNote(note) {
   return note
 }
 
-register('slidey', function (time, pat) {
+register('glide', function (time, pat) {
   let prevNote = null;
   
   const query = (state) => {
@@ -52,12 +65,12 @@ register('slidey', function (time, pat) {
 
 register('click', function (amt, pat) {
   if(amt > 0) {
-    return pat.slideFrom(amt * 60).pattack(0.01) 
+    return pat.slideFrom(amt * 60).pattack(0.015) 
+    
   } else {
     return  pat
   }
 });
-
 
 register('print_haps', function (pat) {
   const haps = pat.queryArc(0, 1);
@@ -65,3 +78,40 @@ register('print_haps', function (pat) {
   return pat;
 });
 
+register('waitForCycle', function (pat) {
+  let onsetCycleBegin = null
+  let cycleStartReached = false;
+  let callCount = 0 // first few calls of state.span.begin are always 0 for some reason
+  const callCountThreshold = 10 // so we need to get it at the nth call, pretty wonky
+
+  const query = (state) => {
+    const haps = pat.query(state);
+
+    if (cycleStartReached) {
+      return haps
+    } else {
+      if (onsetCycleBegin == null && callCount > callCountThreshold) {
+        const currCycleBegin = state.span.begin;
+        onsetCycleBegin = currCycleBegin.nextSam()
+      } else {
+        callCount += 1
+      }
+
+      const new_haps = []
+      for (var i = 0; i < haps.length; i++) {
+        let hap = haps[i]
+        if (
+          (
+            hap.part.begin.gte(onsetCycleBegin)
+            && onsetCycleBegin != null
+          ) || cycleStartReached
+        ) {
+          cycleStartReached = true
+          new_haps.push(hap);
+        }
+      }
+      return new_haps
+    };
+  }
+  return new Pattern(query);
+});

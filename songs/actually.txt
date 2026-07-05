@@ -1,0 +1,53 @@
+var bpm = 120
+setcpm(bpm/4)
+
+dong: note("4 5 1 0").scale("C:major")
+  .sound("gm_pad_bowed")
+  .sometimesBy(
+    0.2, 
+    x=>x.superimpose(
+      x=>x.transpose("12 | 7")
+    )
+  )
+  .decay(0.5)
+  .ply(2)
+  .legato(1.1)
+  .room(1)
+  .delay(0.5)
+  .orbit(2)
+
+lead: note("<0 -2 -3 -2>!3 [5 4] - 0 7 0")
+  .when("0!3 [0 1] - 0!3", x=>x.legato(3))
+  .glide(0.1)
+  .attack(0.01)
+  .scale("C4:major")
+  .sound("saw")
+  .distort("1:0.5")
+  .orbit(2)
+
+chords: chord("<Am F C <G E>>").voicing()
+  .transpose(-12)
+  .sound("supersaw")
+  .hpf(500)
+  .room(0.5)
+  .orbit(2)
+
+bass: note("<a1 f1 c1 <g1 e1>>").ply(16)
+  .sound("sawtooth")
+  .decay(0.2)
+  .lpf(800)
+  .soft("1:0.5")
+  .orbit(2)
+
+hat: sound("hh*8")
+
+ohat: sound("[- oh] * 4").clip(0.7)
+
+kick: sound("bd:1*4")
+  .duck(2).duckattack(0.1).duckdepth(0.8)
+  .gain(0.5)
+
+clap: sound("[- clap:0]*2")
+  .delay(0.5)
+
+
