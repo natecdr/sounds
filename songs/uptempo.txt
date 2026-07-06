@@ -1,0 +1,15 @@
+var bpm = 195
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+$: note("c3!3 [c3 c3]").stack(
+    sound("[square,saw]*4"),
+    sound("wt_digital*4")
+  )
+  .orbit(2)
+  .duck(2).duckdepth(0.8).duckonset(0.05).duckattack(0.01)
+  .lpf("1000 1000 1000 [1200 2000]")
+  .lpq(30)
+  .distort("10:0.1")

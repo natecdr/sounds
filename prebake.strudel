@@ -115,3 +115,9 @@ register('waitForCycle', function (pat) {
   }
   return new Pattern(query);
 });
+
+register('maskUntilNext', (grid, pat) => {
+  const t = getTime();
+  const qt = Math.ceil(t / grid) * grid;
+  return pat.filterWhen((t) => t >= qt);
+});

@@ -1,0 +1,46 @@
+var bpm = 86
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+metronome: sound("white*4").decay("0.05")
+
+_bass: note("<2 0 -1@2>").scale("A1:minor")
+  .struct("x@2 x@2 x x@2 x@2 x x x x x x x")
+  .when("0@3 1 0@6 1 0@3", x=>x.transpose(12))
+  .velocity(rand.range(0.9,1))
+  .sound("gm_electric_bass_finger")
+  .decay(4)
+
+guitar: note("[0@3 1]".pickRestart(["[2 6 9]*16/3", "[2 6 9 6]*4"]))
+  .scale("A2:minor")
+  .off(0.005, x=>x.transpose("12"))
+  .sound("gm_electric_guitar_jazz:2")
+  .chorus(0.5)
+  .room(2)
+  .delay(0.5)
+  .phaser(0.2)
+
+piano: chord("<Am7 CM7 FM7 G>").voicing()
+  .sound("piano")
+  .room(1)
+  .lpf(2000)
+
+pluck: note("<e5 d5 c5 c5>").sound("sine")
+  .decay(0.3)
+  .room(0.5)
+  .click(1)
+  .delay(0.8)
+
+kick: sound("bd*2")
+
+snare: sound("[- sd]*2").delay(0.2)
+
+// guitar: seq("[2 6 9]*16/3").note().scale("A3:minor")
+//   .restart("x@3 x")
+//   .scale("A3:minor")
+//   .sound("gm_electric_guitar_jazz:1")
+
+// guitar: seq("[2 6 9 2] [6 9 2 6] [9 2 6 9] [2 6 9 6]").note().scale("A3:minor")
+//   .sound("gm_electric_guitar_jazz:1")

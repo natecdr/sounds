@@ -1,0 +1,64 @@
+var bpm = 61
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+$: note("[<0 -2> 4 2 1]!4").scale("A:major")
+  .sound("gm_pad_bowed:1")
+  .attack(0.05)
+  .release(0.01)
+  .room(0.5)
+  .delay(0.2)
+  .orbit(2)
+
+_$: note("[0 <1 2> 3 <6 7>]*4")
+  .sound("gm_acoustic_guitar_steel")
+  .sometimesBy(0.2,
+    x=>x.add(note(irand(7).segment(16))))
+  .scale("A:pentatonic")
+  .velocity(rand.range(0.4, 0.8))
+  .gain(0.8)
+  .room(1)
+  .delay(0.5)
+  .orbit(2)
+  .orbit(2)
+
+_$: note("<5 4>@7 7@9").scale("A2:major")
+  .sound("supersaw").detune(0.1)
+  // .superimpose(x=>x.transpose(12).gain(0.6))
+  .lpf(1200)
+  .lfo({c:"lpf", sync: 16, depth:0.3})
+  .soft(1).gain(0.8)
+  .attack(0.1)
+  .room(2)
+  .orbit(2)
+
+_$: note("<[3@7 <2 4>@9] [1@7 -2@9]>").scale("A1:major")
+  .sound("sine")
+  .soft("2:0.5")
+  .lpf(400)
+  .orbit(2)
+
+_$: chord("<[D@7 A@9] [E@7 <A C#>@9]>").voicing()
+  .sound("saw")
+  .lpf(800)
+  .tremolodepth(0.5).tremolosync(12).tremoloshape("sine")
+  .room(2)
+  .orbit(2)
+
+_$: sound("bd [- bd]")
+  .duck(2).duckattack(0.5).duckdepth(0.5)
+  .lpf(2000)
+
+_$: sound("[- sd:3 - sd:2]")
+  .lpf(800)
+  .hpf(200)
+  .room(3)
+
+_$: sound("hh!8")
+  .gain(0.3)
+  .delay(0.3).delaysync(16)
+
+_$: sound("breaks:3").fit()
+  .lpf(2400)
