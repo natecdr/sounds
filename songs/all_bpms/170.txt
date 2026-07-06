@@ -1,0 +1,48 @@
+var bpm = 170
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+kick: sound("kicks:2").beat("<[0,7,10] [0,7,10,14]>", 16)
+  .duck(2).duckattack(0.1)
+
+hat: sound("hh:4*8")
+
+shaker: sound("shaker_large:1*16")
+  .gain(tri.range(0.4, 1))
+
+rim: sound("rim").beat("6,9",16)
+
+snare: sound("[- snares:0]*2")
+
+bass: note("<-2 3 0 <-3 2>>").scale("D1:major")
+  .sound("saw")
+  .lpf(100)
+  .gain(0.5)
+  .distort("2:0.5")
+  .lfo({c: "gain", shape:"sine", sync:"<8 5 8 6>", dcoffset:0, depthabs:1})
+  .lfo({c: "lpf", shape:"sine", sync:"<8 5 8 6>", dcoffset:0, depthabs:2000})
+  .orbit(2)
+
+chords: chord("<Bm!2 D Em>").voicing()
+  .ply(8)
+  .attack(0.05)
+  .decay(0.2)
+  .sound("saw")
+  .lpf(slider(1041.2, 300, 2000)).lpq(4)
+  .room(0.5)
+  .delay(0.3)
+  .orbit(2)
+
+arp: chord("<Bm!2 D Em>").voicing()
+  .arp("[0 1 2 <3 4>]*2")
+  .superimpose(x=>x.transpose(12))
+  .sound("saw")
+  .decay(0.2)
+  .glide(0.05)
+  .orbit(2)
+  .room(0.5)
+  .distort("1:0.5")
+  
+  
