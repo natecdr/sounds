@@ -78,46 +78,32 @@ register('print_haps', function (pat) {
   return pat;
 });
 
-register('waitForCycle', function (pat) {
-  let onsetCycleBegin = null
-  let cycleStartReached = false;
-  let callCount = 0 // first few calls of state.span.begin are always 0 for some reason
-  const callCountThreshold = 10 // so we need to get it at the nth call, pretty wonky
-
-  const query = (state) => {
-    const haps = pat.query(state);
-
-    if (cycleStartReached) {
-      return haps
-    } else {
-      if (onsetCycleBegin == null && callCount > callCountThreshold) {
-        const currCycleBegin = state.span.begin;
-        onsetCycleBegin = currCycleBegin.nextSam()
-      } else {
-        callCount += 1
-      }
-
-      const new_haps = []
-      for (var i = 0; i < haps.length; i++) {
-        let hap = haps[i]
-        if (
-          (
-            hap.part.begin.gte(onsetCycleBegin)
-            && onsetCycleBegin != null
-          ) || cycleStartReached
-        ) {
-          cycleStartReached = true
-          new_haps.push(hap);
-        }
-      }
-      return new_haps
-    };
-  }
-  return new Pattern(query);
-});
-
 register('maskUntilNext', (grid, pat) => {
   const t = getTime();
   const qt = Math.ceil(t / grid) * grid;
   return pat.filterWhen((t) => t >= qt);
 });
+
+window.fft = (options = {}) => {
+  let index = 0;
+  let buckets = 1;
+  const { id = 'hydra', min = -150, max = 0, scale = 1 } = options;
+
+  if (!analysers?.[id]) {
+    return 0.5;
+  }
+
+  const freq = getAnalyzerData('frequency', id); // as Array<number>;
+  const bucketSize = freq.length / buckets;
+
+  const normalized = freq.map((it /*: number*/) => {
+    const norm = clamp((it - min) / (max - min), 0, 1);
+    return norm * scale;
+  });
+
+  return (
+    normalized
+      .slice(bucketSize * index, bucketSize * (index + 1))
+      .reduce((a, b) => a + b, 0) / bucketSize
+  );
+};
