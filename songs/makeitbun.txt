@@ -1,0 +1,45 @@
+var bpm = 140
+setcpm(bpm/4)
+
+const _lfoskew= slider(0.458, 0, 1)
+const _lfosync= "<2 2 5@2>"
+
+const _lfoshape = "triangle"
+
+const _wtstart=slider("<0.74 0.74 0.5 0.9>")
+// const _wtstart=slider(0.74, 0, 1)
+const _wtdepth=slider(0.229, 0, 1)
+
+const _fmh = 3
+
+const highs = sound("wt_digital")
+  .octave(-2)
+  .n("2")
+  .wt(_wtstart)
+  .hpf(100).hpq(4)
+  .attack(0.01)
+  .lfo({c:"wt", shape:_lfoshape, skew: _lfoskew, sync:_lfosync, depthabs:_wtdepth, dcoffset:0})
+  .lfo({c:"hpf", shape:_lfoshape, skew: _lfoskew, sync:_lfosync, depthabs:2000, dcoffset:0})
+  .fm(1).fmh(_fmh)
+  .room(0.2)
+
+const subbass = sound("saw")
+  .octave(-2)
+  .lpf(800)
+
+growl: stack(
+  subbass, 
+  highs,
+  sound("white").postgain(0.1)
+)
+  .note("<g3 f3 c3@2>")
+  .gain(0.5)
+  .distort(1)
+  .lfo({c:"distort", shape:"sine", skew: _lfoskew, sync:_lfosync, depthabs:2, dcoffset:0})
+  .lfo({c:"gain", shape:_lfoshape, skew: _lfoskew, sync:_lfosync, depthabs:0.5, dcoffset:0}) 
+  .orbit(2)
+
+$: sound("<bd*2>").n("5,7").decay(0.5)
+  .duck("2:3").duckattack("0.3:0.1")
+
+$: sound("[- sd]").n("4,5").speed(0.8).distort(1)

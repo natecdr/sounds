@@ -1,0 +1,36 @@
+var bpm = 140 
+var cpm = bpm/4
+
+setcpm(cpm)
+
+samples('bubo:waveforms');
+samples('github:switchangel/breaks')
+
+$: sound("breaks:0").slow(2).fit()
+  .hpf(400)
+  .orbit(3)
+._scope()
+$: sound("bd:4*4").duck(2).duckattack(0.2)
+
+$: n("0*4").gain(0).duck(3).duckattack(0.1)
+
+$: note("<c4, e4, g3>*8")
+  .s('wt_aguitar')
+  .n(irand(16))
+  .decay(1)
+  // .lpf(tri.range(200, 1000))
+  .lpf(600)
+  .lfo({
+    c: "lpf", sync: 1, depthabs:500
+  })
+  .lpq(10)
+  .room(0.5)
+  .delay(0.5).delays(1/8)
+  .orbit(2)
+  ._spectrum()
+
+$: note("<a1 g1 f1 c1>").slow(2)
+  .sound("supersaw")
+  .lpf(1000)
+  .soft(1)
+  .orbit(2)

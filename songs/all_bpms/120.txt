@@ -1,0 +1,33 @@
+setcpm(120/4)
+
+samples('github:yaxu/clean-breaks')
+
+$: note("[<2 0> -] [<2 0> - 4 0] [-@3 0@2 - 0 -]@2").scale("C4:minor")
+  .pickF("[0 -] [0 - 0 1] [-@3 0@2 - 0 -]@2", [id, x=> x.clip(2)])
+  .sound("sine").decay(0.2)
+  .superimpose(x=> x.transpose(7) )
+  .room(0.3)
+  .delay(0.2).delaysync(1/8)
+  .orbit(2)
+
+$: note("<<4 3> 0!3>".fast(2)).ply(8).scale("C1:minor")
+  .decay(0.5)
+  .sound("saw")
+  .lpf(400)
+  .lpenv(saw.range(1,4))
+  .lpdecay(0.1)
+  .lpq(5)
+  .orbit(2)
+
+$: sound("bd:1*4")
+  .lpf(1000)
+  .duck(2)
+
+$: sound("hh*8")
+  .gain(rand.range(0.2,0.4).segment(8))
+
+$: sound("[- clap:6]*2")
+  .gain(1).room(0.5)
+
+$: sound("apache/2").fit()
+  .gain(0.4)

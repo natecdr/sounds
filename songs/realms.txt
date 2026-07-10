@@ -1,0 +1,52 @@
+var bpm = 174
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+
+$: sound("kicks:2")
+  .struct("[x - [- x] -]")
+  .duck(2).duckattack(0.1).duckdepth(0.8)
+
+$: sound("snares:1")
+  .struct("- x - x")
+
+$: sound("hh*8")
+  .decay(0.1)
+  .sometimesBy(0.1, x=> x.ply(2))
+
+$: chord("<Am7 Fm7 G <C E>>").voicing()
+  .sound("saw")
+  // .decay(0.1)
+  .arp("0 1 4 0 1 4 0 1")
+  .glide(0.03)
+  .attack(0.01)
+  // .click(1)
+  .room(1)
+  .delay(0.3)
+  .lpf(slider(20000, 800, 20000))
+  .gain(slider(1, 0, 1))
+  .orbit(2)
+
+$: note("0 [5 4] 4 0").scale("C4:major")
+  .when("<0 1> 0 0 0", x=>x.transpose(12))
+  .when("1 0 1 1", x=>x.ply(2))
+  .decay(0.3)
+  .attack(0.01)
+  .click(1)
+  .room(1)
+  .sound("supersaw")
+  .orbit(2)
+  
+$: note("<a1 f1 c1 <g1 e1>>").sound("saw")
+  .struct("x@2 - x@4 -")
+  .click(1)
+  .soft(1)
+  .lpf(slider(1778.24, 20, 2000))
+  .orbit(2)
+  .stack(
+    sound("white".struct("x@2 - x@4 -"))
+    .postgain(0.4)
+    .lfo({c:"gain", sync:64})
+  )
+  .gain(slider(0.78, 0, 1))
+  ._punchcard({labels:true})

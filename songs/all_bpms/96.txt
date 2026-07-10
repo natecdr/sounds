@@ -1,0 +1,46 @@
+var bpm = 96
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+$: cat(
+  "5 4 0".euclidLegato(3,8),
+  "- 5 4 0",
+  "5 4 0".euclidLegato(3,8),
+  "- 2 1 0"
+).scale("A:minor").note().fast(2)
+  .sound("gm_lead_4_chiff:0")
+  .room(0.5)
+  .distort("2:0.3")
+  .orbit(2)
+
+$: cat(
+  "0 0 0".euclidLegato(3,8),
+  "- 5 5 4",
+  "-2 -2 -2".euclidLegato(3,8),
+  "- 2 2 1"
+).scale("A1:minor").note().fast(2)
+  .sound("saw")
+  .glide(0.1)
+  .noise(0.1)
+  .distort("4:0.3")
+  .decay(0.5)
+  .orbit(2)
+
+$: note("<[0 5 4]!3 [-2 2 1]>".euclidLegato(3,8)).fast(2).scale("A:minor")
+  .ply("3@3 3@3 2@2".fast(2))
+  .decay(0.2)
+  .distort("3:0.1")
+  .room(1)
+  .sound("gm_distortion_guitar")
+  .orbit(2)
+
+$: sound("bd:4*4")
+  .distort("2:0.5")
+  .duck(2)
+
+$: sound("sd:2")
+  .struct("[0 <1 2>]".pickRestart(["x(5, 16)", "<[- x - x]>".fast(2), "[- x x -]".fast(2)]))
+  .room(0.1)
+  .distort("1:0.7")
