@@ -12,7 +12,7 @@
 const ratchet = register('ratchet', (pat) => pat.sometimes(ply(2)))
 
 register('slideTo', (semitones, pat) => 
-  pat.penv(semitones).panchor(1)
+  pat.penv(semitones).panchor(0)
 )
 
 register('slideFrom', (semitones, pat) => 
@@ -78,46 +78,38 @@ register('print_haps', function (pat) {
   return pat;
 });
 
-register('waitForCycle', function (pat) {
-  let onsetCycleBegin = null
-  let cycleStartReached = false;
-  let callCount = 0 // first few calls of state.span.begin are always 0 for some reason
-  const callCountThreshold = 10 // so we need to get it at the nth call, pretty wonky
-
-  const query = (state) => {
-    const haps = pat.query(state);
-
-    if (cycleStartReached) {
-      return haps
-    } else {
-      if (onsetCycleBegin == null && callCount > callCountThreshold) {
-        const currCycleBegin = state.span.begin;
-        onsetCycleBegin = currCycleBegin.nextSam()
-      } else {
-        callCount += 1
-      }
-
-      const new_haps = []
-      for (var i = 0; i < haps.length; i++) {
-        let hap = haps[i]
-        if (
-          (
-            hap.part.begin.gte(onsetCycleBegin)
-            && onsetCycleBegin != null
-          ) || cycleStartReached
-        ) {
-          cycleStartReached = true
-          new_haps.push(hap);
-        }
-      }
-      return new_haps
-    };
-  }
-  return new Pattern(query);
-});
-
 register('maskUntilNext', (grid, pat) => {
   const t = getTime();
   const qt = Math.ceil(t / grid) * grid;
   return pat.filterWhen((t) => t >= qt);
+});
+
+// resolve a scale degree -> note (e.g. 0 in "A:major" -> "A3") via strudel's own scale()
+const _deg2note = (deg, sc) => pure(deg).scale(pure(sc)).queryArc(0, 1)[0].value;
+const _pc = (note) => note.match(/^[A-G][#b]*/)[0];
+
+const diatonicTriadSymbol = (deg, sc) => {
+  const m = (n) => noteToMidi(_deg2note(n, sc));
+  const root = m(deg);
+  const third = m(deg + 2) - root;
+  const fifth = m(deg + 4) - root;
+  if (third === 4 && fifth === 7) return '';    // major
+  if (third === 3 && fifth === 7) return 'm';   // minor
+  if (third === 3 && fifth === 6) return 'o';   // diminished
+  if (third === 4 && fifth === 8) return 'aug'; // augmented
+  return third <= 3 ? 'm' : '';
+};
+
+register('chordDegree', function (sc, pat) {
+  if (Array.isArray(sc)) sc = sc.flat().join(' ');
+  return pat.fmap((value) => {
+    let degree, symbol;
+    if (Array.isArray(value)) [degree, symbol] = value;              // "0:m7" -> [0,"m7"]
+    else if (value && typeof value === 'object') degree = value.n ?? value.note ?? value.value;
+    else degree = value;                                             // bare "1"
+    degree = Number(degree);
+    const rootPc = _pc(_deg2note(degree, sc));
+    symbol = symbol === undefined ? diatonicTriadSymbol(degree, sc) : String(symbol);
+    return { chord: rootPc + symbol };
+  });
 });
