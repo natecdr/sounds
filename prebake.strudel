@@ -1,16 +1,3 @@
-// Prebake script
-//
-// This is code that is loaded before your pattern is run.
-// You can use it to define custom functions to use in any pattern.
-// 
-// This is an initial example script. You can edit it to add 
-// your own funtions.
-//
-// To use a script shared by some other user you can use
-// the import-button or paste the script in this editor.
-
-const ratchet = register('ratchet', (pat) => pat.sometimes(ply(2)))
-
 register('slideTo', (semitones, pat) => 
   pat.penv(semitones).panchor(0)
 )
@@ -113,3 +100,10 @@ register('chordDegree', function (sc, pat) {
     return { chord: rootPc + symbol };
   });
 });
+
+register('widen', (amt, pat) => 
+  pat.layer(
+    pat=>pat.pan(0.5 + (amt/2)),
+    pat=>pat.pan(0.5 - (amt/2)) 
+  ).postgain(0.8)
+)

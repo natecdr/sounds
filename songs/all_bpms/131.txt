@@ -1,0 +1,53 @@
+var bpm = 130
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+const _scale = "C:major"
+
+$: "[3!4 8 9 3 4@2 3!4 4 9 7]/2".note().scale(_scale)
+  .when("<[x 0 x 0]>", x=>x.transpose(-12))
+  .transpose("-12")
+  .sound("pulse").pw(1)
+  .superimpose(x=>x.sound("supersaw").gain(0.3).transpose(12).detune(0.1))
+  .lpf(500)
+  .hpf(300)
+  .lpq(8)
+  .glide(0.05)
+  .lfo({c: "lpf", sync:1, shape:"cosine", depthabs:8000, dcoffset:0})
+  .distort("4:0.2")
+  .room(0.2)
+  .orbit(2)
+
+$: "<[3@7 4@6 2@3]/2>".note().scale(_scale)
+  .octave(-2)
+  .sound("saw")
+  .lpf(800)
+  .orbit(2)
+
+$: note("<[- 1 1 [0 -] 0@3 -] [- 1 1 [0 -] 1 [0 -] 1 [0 -]]>").scale(_scale)
+  .octave(2)
+  .sound("supersaw")
+  .penv(0)
+  .room(2)
+  .attack(0.02)
+  .lpf(2000)
+  .gain(0.2)
+  .distort("2:0.1")
+  .widen(slider(0.912, 0, 1)).log()
+  .orbit(3).log()
+
+$: sound("bd:1")
+  .struct("x*4")
+  .gain(slider(0.624, 0, 1))
+  .duck(2)
+
+$: sound("sd:3")
+  .struct("[- x]*2")
+  .decay(0.2)
+  .gain(slider(0.65, 0, 1))
+
+$: sound("[- hh]*4")
+
+$: sound("shaker_large*16").gain(tri.range(0.3, 0.8).fast(2))
