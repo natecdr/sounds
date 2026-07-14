@@ -1,0 +1,41 @@
+var bpm = 150
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+const _scale = "D:minor"
+
+_arp: note("1 2 4 0").scale(_scale)
+  .transpose("12, 0")
+  .off(1/6, id)
+  .delay(0.5)
+  .sound("pulse").pw(0.1)
+  .lpf(slider(699.5, 300, 2000)).lpq(3)
+  .hpf(200)
+  .decay(0.1)
+  .distort("2:0.3")
+  .off(1/10, x=>x.transpose(7).lpf(slider(455.6, 200, 2000)).delay(1))
+  .room(0.5)
+  .orbit(2)
+
+ld: note("<2 4 0 1>!5").scale(_scale)
+  .off(1/16, x=>x.transpose(7))
+  .sound("square")
+  .lpf(slider(3262, 400, 4000))
+  .room(1)
+  .legato(0.5)
+  .decay(0.3)
+  .orbit(2)
+
+bass: note("<2 4 0 1>").scale(_scale).transpose(-24)
+  .ply(16)
+  .sound("square")
+  .lpf(1200)
+  .distort("2:0.2")
+  .orbit(2)
+
+kick: sound("bd:1")
+  .struct("[x x] x(3,8)")
+  .lpf(2000)
+  .duck(2).duckdepth(0.8)
