@@ -1,0 +1,57 @@
+var bpm = 151
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+samples('shabda/speech:lose_yourself')
+
+const _scale = "D:minor"
+
+
+lead: note("<2 1 4 0>").scale(_scale)
+  .sound("saw")
+  .attack(0.1)
+  .release(0.5)
+  .lpf(slider(2376, 400, 8000))
+  .glide(0.5)
+  .room(1)
+  .orbit(2)
+  //.superimpose(x=>x.transpose(5))
+
+bass: note("<0 0 -2 -1>").scale(_scale)
+  .transpose(-24)
+  .sound("saw")
+  .lpf(400)
+  .distort("2:0.4")
+  .orbit(2)
+
+
+arp: note(irand(4).segment(8))
+  .scale("D:minor:pentatonic")
+  .sound("saw")
+  .decay(0.1)
+  .transpose("12")
+  .rib(4, 2)
+  .delay(0.5)
+  .orbit(2)
+  .glide(0.02)
+  .room(slider(1, 0, 1))
+
+voice: sound("lose_yourself")
+  //.slice(16, irand(16).seg(8))
+  .scrub(irand(16).div(16).seg(8))
+  .transposeSample("3")
+  .rib("<67 62 67 9>", 1)
+  .room(0.5)
+  .delay(0.3)
+  .orbit(2)
+  ._punchcard()
+kick: sound("bd:1!4")
+  .lpf(slider(3581, 200, 10000))
+  .duck(2).duckdepth(0.8)
+
+hat: sound("hh!4")
+
+snare: sound("[- sd:1]!2").room(0.5)
+  .gain(0.5)
