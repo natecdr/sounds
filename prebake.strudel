@@ -12,7 +12,7 @@
 const ratchet = register('ratchet', (pat) => pat.sometimes(ply(2)))
 
 register('slideTo', (semitones, pat) => 
-  pat.penv(semitones).panchor(1)
+  pat.penv(semitones).panchor(0)
 )
 
 register('slideFrom', (semitones, pat) => 
@@ -84,26 +84,103 @@ register('maskUntilNext', (grid, pat) => {
   return pat.filterWhen((t) => t >= qt);
 });
 
-window.fft = (options = {}) => {
-  let index = 0;
-  let buckets = 1;
-  const { id = 'hydra', min = -150, max = 0, scale = 1 } = options;
+window.oneshot = register('oneshot', (grid, pat) => {
+  const t = getTime();
+  const qt = Math.ceil(t / grid) * grid;
+  return pat.filterWhen((t) => t >= qt && t < qt + 1);
+});
 
-  if (!analysers?.[id]) {
-    return 0.5;
+
+window.automate = register('automate', function (pat) {
+  return new Pattern((state) => {
+    const haps = []
+    for (const hap of pat.queryArc(state.span.begin, state.span.end)) {
+      if (Array.isArray(hap.value)) {
+        const start = hap.whole.begin.valueOf()
+        const end = hap.whole.end.valueOf()
+        const a = hap.value[0]
+        const b = hap.value[1]
+  
+        const progress = (state.span.begin - start) / (end - start)
+        haps.push(new Hap(hap.whole, hap.part, a + (b - a) * progress, hap.context))
+      } else {
+        haps.push(hap)
+      }
+    }
+    return haps
+  })
+})
+
+// chord by root
+const _deg2noteCache = new Map();
+const _deg2note = (deg, sc) => {
+  const key = sc + '|' + deg;
+  let v = _deg2noteCache.get(key);
+  if (v === undefined) {
+    v = pure(deg).scale(pure(sc)).queryArc(0, 1)[0].value;
+    _deg2noteCache.set(key, v);
   }
-
-  const freq = getAnalyzerData('frequency', id); // as Array<number>;
-  const bucketSize = freq.length / buckets;
-
-  const normalized = freq.map((it /*: number*/) => {
-    const norm = clamp((it - min) / (max - min), 0, 1);
-    return norm * scale;
-  });
-
-  return (
-    normalized
-      .slice(bucketSize * index, bucketSize * (index + 1))
-      .reduce((a, b) => a + b, 0) / bucketSize
-  );
+  return v;
 };
+
+const _pc = (note) => note.match(/^[A-G][#b]*/)[0];
+
+const _triadCache = new Map();
+const diatonicTriadSymbol = (deg, sc) => {
+  const key = sc + '|' + deg;
+  let sym = _triadCache.get(key);
+  if (sym !== undefined) return sym;
+
+  const m = (n) => noteToMidi(_deg2note(n, sc));
+  const root = m(deg);
+  const third = m(deg + 2) - root;
+  const fifth = m(deg + 4) - root;
+  if (third === 4 && fifth === 7) sym = '';
+  else if (third === 3 && fifth === 7) sym = 'm';
+  else if (third === 3 && fifth === 6) sym = 'o';
+  else if (third === 4 && fifth === 8) sym = 'aug';
+  else sym = third <= 3 ? 'm' : '';
+
+  _triadCache.set(key, sym);
+  return sym;
+};
+
+const _chordResultCache = new Map();
+
+register('chordDegree', function (sc, pat) {
+  if (Array.isArray(sc)) sc = sc.flat().join(' ');
+  return pat.fmap((value) => {
+    let degree, symbol;
+    if (Array.isArray(value)) [degree, symbol] = value;
+    else if (value && typeof value === 'object') degree = value.n ?? value.note ?? value.value;
+    else degree = value;
+    degree = Number(degree);
+
+    const resKey = sc + '|' + degree + '|' + (symbol ?? '');
+    let result = _chordResultCache.get(resKey);
+    if (result !== undefined) return result;
+
+    const rootPc = _pc(_deg2note(degree, sc));
+    const sym = symbol === undefined ? diatonicTriadSymbol(degree, sc) : String(symbol);
+    result = { chord: rootPc + sym };
+
+    _chordResultCache.set(resKey, result);
+    return result;
+  });
+});
+
+register('widen', (amt, pat) => 
+  pat.layer(
+    pat=>pat.pan(0.5 + (amt/2)),
+    pat=>pat.pan(0.5 - (amt/2)) 
+  ).postgain(0.8)
+)
+
+register('transposeSamplePreserve', (semitones, pat) => {
+  const p = 2 ** (semitones / 12);              // desired frequency ratio
+  return pat.stretch(p >= 1 ? p - 1 : 4 * (p - 1));
+});
+
+register('transposeSample', (semitones, pat) =>
+  pat.mul(speed(2 ** (semitones / 12)))
+);

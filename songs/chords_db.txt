@@ -1,0 +1,45 @@
+var bpm = 147
+setCpm(bpm/4)
+
+//$: chord("<Am E7 G D F C Dm E7>").voicing()
+//$: chord("<CM7 C^9 GM7 D>").voicing()
+$: chord("<Dm7 G7 C Am>").voicing()
+
+//$: chord("<Am C G F>").voicing()
+//$: chord("<Am C F G>").voicing()
+//$: chord("<Am G C F>").voicing()
+//$: chord("<Am G F C>").voicing()
+//$: chord("<Am F C G>").voicing()
+//$: chord("<Am F G C>").voicing()
+
+//$: chord("<C F G Am>").voicing()
+//$: chord("<C F Am G>").voicing()
+//$: chord("<C Am F G>").voicing()
+//$: chord("<C Am G F>").voicing()
+//$: chord("<C G F Am>").voicing()
+//$: chord("<C G Am F>").voicing()
+
+//$: chord("<F G Am C>").voicing()
+//$: chord("<F G C Am>").voicing()
+//$: chord("<F C Am G>").voicing()
+//$: chord("<F C G Am>").voicing()
+//$: chord("<F Am C G>").voicing()
+//$: chord("<F Am G C>").voicing()
+
+//$: chord("<G Am C F>").voicing()
+//$: chord("<G Am F C>").voicing()
+//$: chord("<G F Am C>").voicing()
+//$: chord("<G F C Am>").voicing()
+//$: chord("<G C F Am>").voicing()
+//$: chord("<G C Am F>").voicing()
+
+// Am Secondary dominants
+//$: "<Am C G E>".chord().voicing()
+//$: chord("<C F E Am>").voicing()
+
+$: note("<C3>").sound("supersaw")
+  .detune(0.1)
+  .room(0.5)
+
+$: sound("bd/4")
+$: sound("hh")

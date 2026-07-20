@@ -1,0 +1,38 @@
+var bpm = 122
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+const _scale = "A:major"
+
+$: "<5@2 4 1>".chordDegree(_scale).voicing()
+  .superimpose(
+    x=>x.arp(irand(4).segment(16).rib(1, 1))
+      .transpose(24).gain(0.3).glide(0.01)
+  )
+  .orbit(2)
+
+$: "7 0 - 0 7 0 - [0|7]".note().scale(_scale)
+  .transpose(12)
+  .room(0.5)
+  .orbit(2)
+
+$: "2 1 0 -2 [-1 0] - <1 0> -".note().scale(_scale).transpose(0)
+  .orbit(2)
+
+$: "<5@2 0 1>".note().scale(_scale).transpose(-24).distort("3:0.3")
+  .orbit(2)
+
+$: "4".note().scale(_scale).transpose(0).room(0.5)
+  .orbit(2)
+
+$: stack(
+    "c1*4".note().click(1).decay(0.1),
+    "c1*4".note().slideFrom(12).decay(0.4),
+    //sound("white*4").decay(0.01).gain(0.02)
+  ).distort("2:0.5")
+  duck(2).duckdepth(0.5)
+
+$: sound("[- hh]*4")
+$: sound("[- sd:0]*2")

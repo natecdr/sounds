@@ -1,0 +1,49 @@
+setcpm(82/4)
+
+let bass_subdiv = 16
+
+bass: note("<0 7 4!2>").ply(bass_subdiv).scale("A1:minor")
+  .transpose("0 | 8 | 12 | 5".fast(bass_subdiv).rib(3, 1))
+  .sound("saw")
+  .lpf(800)
+  .lpenv(-2)
+  .lpa(0.1)
+  .decay(0.2)
+  .lpq(4)
+  .distort("2: 0.3")
+
+pad: note("<[[0|1|2|3], 5, 7]@2 [0, 4, 7]@2>").scale("A:minor")
+  .sound("sine")
+  .attack(0.1)
+  .room(1)
+  .fm(1)
+  .lpf(1000)
+  .fmh(1)
+  .lfo({c: "fmh", sync: rand.range(1, 2), depth: rand.range(0.01, 0.1)})
+  .noise(0.2)
+
+_arp: note("<[[0|1|2|3], 5, 7]@2 [0, 4, 7]@2>")
+  .scale("A4:minor").arp("0 1 2 3".fast(4))
+  .transpose("0!3 12".fast(4))
+  .glide(0.05)
+  .room(1)
+  .delay(0.5)
+  .gain(slider(0.701, 0, 1))
+
+candy: note("[- [7 0] - -]!2").scale("A5:minor")
+  .mask(brandBy(0.2).struct("x!2"))
+  .decay(0.1)
+  .room(1)
+  .delay(0.3)
+  .sound("saw")
+
+_rumble: note("<7@2 4@2>").scale("A0:minor")
+  .sound("supersaw")
+  .distort("2:0.3")
+
+_kick: sound("bd").lpf(400).delay(0.5)
+  .struct("<x [- x - -]>*2")
+
+_snare: sound("- sd:2").lpf(1000).room(1).delay(0.5).delaysync(1/36)
+
+_hh: sound("hh hh hh hh oh hh hh hh").crush(5).distort("2:0.2").lpf(4000).pan(rand)
