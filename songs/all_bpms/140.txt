@@ -1,0 +1,44 @@
+var bpm = 140
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+
+$: chord("<[EM7(3, 8) [- D#m7]] [C#m7(3,8) [- F#]]>").voicing()
+  .sound("saw")
+  .lpf(400).lpdc(0).lpenv(8).lpattack(0.05).lpdecay(0.2).lprelease(0.2)
+  .widen(0.5)
+  .room(0.2)
+  .delay(0.1)
+  .orbit(2)
+
+
+$: note("0 0 [7 0] [- 0] - [0]!3").scale("B:major")
+  .transpose("<-3 5 -3 2>")
+  .transpose(-24)
+  .decay(0.2)
+  .sound("saw")
+  .distort("1:0.5")
+  .lpf(1200)
+  .orbit(2)
+
+$: note("[5 [0 |-2]]*4").degradeBy(0.2).scale("B:major")
+  .sound("sine")
+  .transpose(12)
+  .widen(0.4)
+  .delay(0.2)
+  .decay(0.1)
+
+$: note("- - - [5, 7] - - - -").scale("B:major")
+  .sound("gm_voice_oohs:0")
+  .decay(0.5)
+  .room(0.5)
+  .delay(1).delaysync(8).gain(0.5)
+
+
+kick: sound("bd:1*4").lpf(3000)
+  .duck(2)
+
+hat: sound("hh*8").gain(0.6)
+shaker: sound("shaker_large*16").gain(0.2)
+
+clap: sound("[- [clap:1, sd:1]]*2").gain(0.3)

@@ -1,0 +1,66 @@
+const bpm = 87
+setcpm(bpm / 4)
+
+const _scale = "G#:major"
+
+$: note("0@2 - 0@3 -@2")
+  .scale(_scale)
+  .scaleTranspose("<-2 4 0 3>")
+  .octave(-2)
+  .sound("supersaw")
+  .asym(1)
+  .orbit(2)
+
+$: "<-2:m7 4 0:M7 3>".chordDegree(_scale).voicing()
+  .struct("x@2 - x@3 -@2")
+  .sound("saw")
+  .white(0.15)
+  .widen(1)
+  .room(0.3)
+  .hpf(150)
+  .orbit(2)
+
+_piano: "<-2:m7 4 0:M7 3>".chordDegree(_scale).voicing()
+  .struct("x")
+  .sound("piano")
+  .superimpose(x=>x.arp("[0 2 0 1]*4").transpose(24))
+  .widen(0.5)
+  .room(0.3)
+  .orbit(2)
+
+$: note("- [5 4] - <1 0>@3 - -").scale(_scale)
+  .octave(1)
+  .sound("saw")
+  .glide(0.05)
+  .room(0.5)
+  .orbit(2)
+
+$: note(
+    "-!6 0@2"
+    .add(
+      irand(5)).pickSqueeze(
+        [
+          "7", 
+          "2 1", 
+          "4 3 2 0", 
+          "1 0", 
+          irand(6).seg(4)
+        ]
+      )
+  ).scale(_scale)
+  .octave(2)
+  .sound("square")
+  .room(0.3)
+  .delay(0.5)
+  .gain(0.5)
+  .pan(brand.seg(16))
+  .orbit(2)
+
+$: sound("bd:2").struct("x@3 x@2 [x | -] -@2")
+  .duck(2)
+
+$: sound("sd").n("2,3").struct("[- x]*2").gain(0.4)
+
+$: sound("[hh hh hh hh oh]*5").struct("x*16").gain(0.4).cut(1)
+
+//all(x=>x.lpf(slider(4000, 400, 4000)).lpq(4))

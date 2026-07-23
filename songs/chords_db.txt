@@ -43,3 +43,42 @@ $: note("<C3>").sound("supersaw")
 
 $: sound("bd/4")
 $: sound("hh")
+
+
+#######################
+var bpm = 200
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+
+//$: "<0 4 5 3>".chordDegree("C:major").voicing()
+//$: "<0 5 3 4>".chordDegree("C:major").voicing().log()
+//$: "<0 4 3 4>".chordDegree("C:major").voicing().log()
+//$: "<3 4 5 2>".chordDegree("C:major").voicing().log()
+//$: "<0 3 b6:M 3>".chordDegree("C:major").voicing().log()
+//$: "<0 3 1 4>".chordDegree("C:major").voicing().log()
+//$: "<0 3 4 5>".chordDegree("C:major").voicing().log()
+//$: "<0 2:M 5 3>".chordDegree("C:major").voicing().log()
+//$: "<0 b2 3 b2>".chordDegree("C:major").voicing().log()
+//$: "<0 3 4 0>".chordDegree("C:major").voicing().log()
+//$: "<0 [6:o 2:7] 5 [3 4]>".chordDegree("C:major").voicing()
+//$: "<0 0:7 3 3:m>".chordDegree("C:major").voicing()
+//$: "<5 4 0 4>".chordDegree("C:major").voicing()
+//$: "<0 b2:o 1 4>".chordDegree("C:major").voicing()
+ 
+
+//$: "<0 5 2 6>".chordDegree("C:minor").voicing()
+//$: "<0 6 5 4:7>".chordDegree("C:minor").voicing()
+$: "<0 2 3 4>".chordDegree("C:minor").voicing()
+//$: "<0 3:7 4:7 0>".chordDegree("C:minor").voicing()
+//$: "<0 5:7 3:7 4:7>".chordDegree("C:minor").voicing()
+//$: "<0 0 5 3>".chordDegree("C:minor").voicing()
+//$: "<0 5 1:o 4:7>".chordDegree("C:minor").voicing()
+ .arp("0 1 2 3")
+  .off(1/4, x=>x.transpose(12))
+  .room(1)
+  .widen(1)
+  .delay(0.5)
+  .attack(0.05).decay(0.3)
+  .lpf(200).lpdc(0).lpenv(2).lpattack(0.2)
+  .lfo({c:"lpf", sync:1/4, dc:0, depthabs: 1000})

@@ -1,0 +1,41 @@
+var bpm = 160
+setcpm(bpm/4)
+
+samples('github:natecdr/sounds')
+samples('github:switchangel/breaks')
+
+samples('shabda/speech:hi')
+
+const _scale = "E:minor"
+
+vox: sound("hi").fit()
+  .transposeSamplePreserve("24")
+  .distort("4:0.2")
+  .speed(0.3)
+  //.scrub(irand(16).div(16).seq(8))
+  .slice(8, irand(8).seg(8))
+  .rib("<15 17>", 1)
+  .orbit(2)
+  .room(0.3)
+
+lead: note("7 0 <0 1 2> 7 <2 3> 4 7 0").scale("E:phrygian")
+  .sound("saw").transpose(0)
+  .room(0.5)
+  .delay(0.3)
+  .orbit(2)
+
+bass: note("<0 2 1 1>").scale(_scale)
+  .sound("saw")
+  .transpose(-24)
+  .distort("3: 0.2")
+  .ply(4)
+  .decay(0.5)
+  .orbit(2)
+
+hat: sound("hh*8")
+
+kick: sound("<[bd*4] [bd bd bd [bd bd]]>").n(1).lpf(800)
+  .duck(2)
+
+snare: sound("[- sd:4]*2")
+  .decay(0.2)

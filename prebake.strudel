@@ -9,7 +9,7 @@
 // To use a script shared by some other user you can use
 // the import-button or paste the script in this editor.
 
-const ratchet = register('ratchet', (pat) => pat.sometimes(ply(2)))
+const ratchet = register('ratchet', (pat) => pat.sometimes(ply(3)))
 
 register('slideTo', (semitones, pat) => 
   pat.penv(semitones).panchor(0)
@@ -106,67 +106,60 @@ window.automate = register('automate', function (pat) {
 })
 
 // chord by root
-const _deg2noteCache = new Map();
-const _deg2note = (deg, sc) => {
-  const key = sc + '|' + deg;
-  let v = _deg2noteCache.get(key);
-  if (v === undefined) {
-    v = pure(deg).scale(pure(sc)).queryArc(0, 1)[0].value;
-    _deg2noteCache.set(key, v);
-  }
-  return v;
+const memo = (fn) => {
+  const cache = new Map();
+  return (...args) => {
+    const k = args.join('|');
+    if (!cache.has(k)) cache.set(k, fn(...args));
+    return cache.get(k);
+  };
 };
 
-const _pc = (note) => note.match(/^[A-G][#b]*/)[0];
+const deg2note = memo((deg, sc) => pure(deg).scale(pure(sc)).queryArc(0, 1)[0].value);
+const pc = (note) => note.match(/^[A-G][#b]*/)[0];
+const accVal = (s) => [...s].reduce((a, c) => a + (c === 'b' ? -1 : 1), 0);
 
-const _triadCache = new Map();
-const diatonicTriadSymbol = (deg, sc) => {
-  const key = sc + '|' + deg;
-  let sym = _triadCache.get(key);
-  if (sym !== undefined) return sym;
-
-  const m = (n) => noteToMidi(_deg2note(n, sc));
-  const root = m(deg);
-  const third = m(deg + 2) - root;
-  const fifth = m(deg + 4) - root;
-  if (third === 4 && fifth === 7) sym = '';
-  else if (third === 3 && fifth === 7) sym = 'm';
-  else if (third === 3 && fifth === 6) sym = 'o';
-  else if (third === 4 && fifth === 8) sym = 'aug';
-  else sym = third <= 3 ? 'm' : '';
-
-  _triadCache.set(key, sym);
-  return sym;
+// parses b6 into degree 6 / alt -1, #4 or s4 into degree 4 / alt +1
+const parseDegree = (v) => {
+  const m = String(v).match(/^([#bs]*)(-?\d+)$/);
+  if (!m) throw new Error('chordDegree: cannot parse degree ' + v);
+  return [Number(m[2]), accVal(m[1].split('s').join('#'))];
 };
 
-const _chordResultCache = new Map();
+// shift a pitch class by semitones, keeping the letter (B down 1 -> Bb, D# down 1 -> D)
+const alterPc = (p, alt) => {
+  const [, letter, accs] = p.match(/^([A-G])([#b]*)$/);
+  const n = accVal(accs) + alt;
+  return letter + (n >= 0 ? '#'.repeat(n) : 'b'.repeat(-n));
+};
 
-register('chordDegree', function (sc, pat) {
+const triadSymbol = memo((deg, sc) => {
+  const m = (n) => noteToMidi(deg2note(n, sc));
+  const [third, fifth] = [m(deg + 2) - m(deg), m(deg + 4) - m(deg)];
+  if (third === 4 && fifth === 7) return '';
+  if (third === 3 && fifth === 7) return 'm';
+  if (third === 3 && fifth === 6) return 'o';
+  if (third === 4 && fifth === 8) return 'aug';
+  return third <= 3 ? 'm' : '';
+});
+
+register('chordDegree', (sc, pat) => {
   if (Array.isArray(sc)) sc = sc.flat().join(' ');
   return pat.fmap((value) => {
-    let degree, symbol;
-    if (Array.isArray(value)) [degree, symbol] = value;
-    else if (value && typeof value === 'object') degree = value.n ?? value.note ?? value.value;
-    else degree = value;
-    degree = Number(degree);
-
-    const resKey = sc + '|' + degree + '|' + (symbol ?? '');
-    let result = _chordResultCache.get(resKey);
-    if (result !== undefined) return result;
-
-    const rootPc = _pc(_deg2note(degree, sc));
-    const sym = symbol === undefined ? diatonicTriadSymbol(degree, sc) : String(symbol);
-    result = { chord: rootPc + sym };
-
-    _chordResultCache.set(resKey, result);
-    return result;
+    let symbol;
+    if (Array.isArray(value)) [value, symbol] = value;
+    else if (value && typeof value === 'object') value = value.n ?? value.note ?? value.value;
+    const [deg, alt] = parseDegree(value);
+    const root = alterPc(pc(deg2note(deg, sc)), alt);
+    const sym = symbol ?? (alt ? (alt < 0 ? '' : 'o') : triadSymbol(deg, sc));
+    return { chord: root + sym };
   });
 });
 
 register('widen', (amt, pat) => 
   pat.layer(
     pat=>pat.pan(0.5 + (amt/2)),
-    pat=>pat.pan(0.5 - (amt/2)) 
+    pat=>pat.pan(0.5 - (amt/2)).late(0.001)
   ).postgain(0.8)
 )
 
@@ -178,3 +171,20 @@ register('transposeSamplePreserve', (semitones, pat) => {
 register('transposeSample', (semitones, pat) =>
   pat.mul(speed(2 ** (semitones / 12)))
 );
+
+//Distort makeup gain
+const distGain = (d, A = 0.5, algo = 'scurve', N = 2048) => {
+  const k = Math.expm1(d), f = distortionAlgorithms[algo];
+  let ms = 0;
+  for (let i = 0; i < N; i++) ms += f(A * Math.sin(2 * Math.PI * i / N), k) ** 2;
+  const makeup = (A / Math.SQRT2) / Math.sqrt(ms / N);
+  return Math.min(1, makeup); // worklet clamps postgain to ≤ 1 anyway
+};
+
+// wrap it so you never think about it again
+// renamed to avoid clobbering the built-in `dist` alias
+const distRect = register('distRect', (d, pat) => pat.distort(d).distortvol(distGain(d)));
+
+register('white', (level, pat) => 
+  stack(pat, s("white").gain(level).struct(pat).clip(1))
+)
