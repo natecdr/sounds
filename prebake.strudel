@@ -72,6 +72,12 @@ register('click', function (amt, pat) {
   }
 });
 
+register('print_haps', function (pat) {
+  const haps = pat.queryArc(0, 1);
+  console.log(haps.map((e) => e.show()));
+  return pat;
+});
+
 register('maskUntilNext', (grid, pat) => {
   const t = getTime();
   const qt = Math.ceil(t / grid) * grid;
